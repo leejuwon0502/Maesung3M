@@ -1,1 +1,4 @@
-console.log(3)
+function hi() {
+  console.log("hi");
+}
+
