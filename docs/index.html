@@ -20,20 +20,28 @@
 			var y = canvas.height-30;
 			var dx = 2;
 			var dy = -2;
-			function update() {
+			var CharRadius = 10;
+			function UpdateFrame() {
 				ctx.beginPath();
-				ctx.arc(x, y, 10, 0, Math.PI*2);
+				ctx.arc(x, y, CharRadius, 0, Math.PI*2);
 				ctx.fillStyle = "#0095DD";
 				ctx.fill();
 				ctx.closePath();
 			}
 			function draw() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				update()
+				UpdateFrame()
+				if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+				    dx = -dx;
+				}
+				if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+				    dy = -dy;
+				}
 				x += dx;
 				y += dy;
 			}
 			setInterval(draw, 10);
+			//keydown, keyup, e.KeyCode : 37 : left arrow, 39 : right arrow
 		</script>
 	</body>
 </html>
