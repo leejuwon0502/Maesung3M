@@ -12,9 +12,10 @@
 		<canvas id="Canvas" width="480" height="320"></canvas>
 		<script>
 			var canvas = document.getElementById("Canvas");
+			var ctx = canvas.getContext("2d");
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
-			var ctx = canvas.getContext("2d");
+			
 			var x = canvas.width/2;
 			var y = canvas.height-30;
 			var dx = 2;
