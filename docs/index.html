@@ -15,11 +15,10 @@
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
 			var ctx = canvas.getContext("2d");
-			ctx.beginPath();
-			ctx.rect(20, 40, 50, 50);
-			ctx.fillStyle = "#FF0000";
-			ctx.fill();
-			ctx.closePath();
+			function draw() {
+				
+			}
+			setinverval(draw, 10);
 		</script>
 	</body>
 </html>
