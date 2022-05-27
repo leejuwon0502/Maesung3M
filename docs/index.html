@@ -31,10 +31,10 @@
 			function draw() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				UpdateFrame()
-				if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+				if(x + dx > canvas.width-CharRadius || x + dx < CharRadius) {
 				    dx = -dx;
 				}
-				if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {
+				if(y + dy > canvas.height-CharRadius || y + dy < CharRadius) {
 				    dy = -dy;
 				}
 				x += dx;
