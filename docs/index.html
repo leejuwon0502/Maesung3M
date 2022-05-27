@@ -16,10 +16,14 @@
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
 			
+			class GameObject {
+				constructor(coord) {
+					this.x = coord.x;
+					this.y = coord.y;
+				}
+			}
 			var x = canvas.width/2;
 			var y = canvas.height-30;
-			var dx = 2;
-			var dy = -2;
 			var CharRadius = 10;
 			function UpdateFrame() {
 				ctx.beginPath();
@@ -37,9 +41,8 @@
 				if(y + dy > canvas.height-CharRadius || y + dy < CharRadius) {
 				    dy = -dy;
 				}
-				x += dx;
-				y += dy;
 			}
+			function MoveChar()
 			setInterval(draw, 10);
 			//keydown, keyup, e.KeyCode : 37 : left arrow, 39 : right arrow
 		</script>
