@@ -29,13 +29,12 @@
 			function Render() {
 				MoveChar();
 			}
-			function OnFrame() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			function Update() {
 				Render();
-
 			}
 			function MoveChar() {
 				ctx.beginPath();
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
 				ctx.arc(x, y, CharRadius, 0, Math.PI*2);
 				ctx.fillStyle = "#0095DD";
 				ctx.fill();
@@ -49,7 +48,7 @@
 				    dy = -dy;
 				}
 			}
-			setInterval(OnFrame, 10);
+			setInterval(Update, 10);
 			//keydown, keyup, e.KeyCode : 37 : left arrow, 39 : right arrow
 		</script>
 	</body>
