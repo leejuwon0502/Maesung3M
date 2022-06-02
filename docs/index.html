@@ -17,7 +17,7 @@
 			canvas.height = document.body.clientHeight;
 			
 			class GameObject {
-				constructor(coord = { x : 0, y : 0}) {
+				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
 					this.x = coord.x; //todo vector
 					this.y = coord.y;
 				}
@@ -25,7 +25,7 @@
 			var Char = new GameObject()
 			Char.Radius = 10;
 // 			var x = canvas.width/2;
-// 			var y = canvas.height-30;
+// 			var y = ;
 			function Render() {
 				MoveChar();
 			}
@@ -35,7 +35,7 @@
 			function MoveChar() {
 				ctx.beginPath();
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				ctx.arc(Char.x, Char.y, Char.CharRadius, 0, Math.PI*2);
+				ctx.arc(Char.x, Char.y, Char.Radius, 0, Math.PI*2);
 				ctx.fillStyle = "#0095DD";
 				ctx.fill();
 				ctx.closePath();
