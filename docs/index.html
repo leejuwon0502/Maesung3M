@@ -16,27 +16,20 @@
 			window.addEventListener("keydown", ChkKey)
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
-			
+			//system
+			var OnPress = {};
 			function ChkKey(e) {
 			    var code = e.keyCode;
 			    switch (code) {
-			        case 65: 
+			    	case 87: OnPress.w(); break;
+			        case 65: OnPress.a(); break;
+			        case 83: OnPress.s(); break;
+			        case 68: OnPress.d(); break;
 			    }
 			}
-			var OnPress = {};
 			function OnKey(key, func) {
-				KeyFunction[key] = func;
+				OnPress[key] = func;
 			}
-			class GameObject {
-				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
-					this.x = coord.x; //todo vector
-					this.y = coord.y;
-				}
-			}
-			var Char = new GameObject()
-			Char.Radius = 10;
-// 			var x = canvas.width/2;
-// 			var y = ;
 			function Render() {
 				MoveChar();
 			}
@@ -44,6 +37,26 @@
 				Render();
 				ControllChar();
 			}
+			class GameObject {
+				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
+					this.x = coord.x;
+					this.y = coord.y;
+				}
+			}
+			//api
+			function IsCollideWithWall() { //fix
+				if(x + dx > canvas.width-CharRadius || x + dx < CharRadius) {
+				    dx = -dx;
+				}
+				if(y + dy > canvas.height-CharRadius || y + dy < CharRadius) {
+				    dy = -dy;
+				}
+			}
+			//variables
+			let Char = new GameObject()
+			Char.Radius = 10;
+			var MoveSpeed = 10;
+			//code
 			function MoveChar() {
 				ctx.beginPath();
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,16 +68,12 @@
 			function ControllChar() {
 				
 			}
-			function IsCollideWithWall() { //fix
-				if(x + dx > canvas.width-CharRadius || x + dx < CharRadius) {
-				    dx = -dx;
-				}
-				if(y + dy > canvas.height-CharRadius || y + dy < CharRadius) {
-				    dy = -dy;
-				}
-			}
+			OnKey('a', () => {
+				Char.x -= MoveSpeed;
+				console.log(3)
+			})
+			//interval
 			setInterval(Update, 10);
-			//keydown, keyup, e.KeyCode : 37 : left arrow, 39 : right arrow
 		</script>
 	</body>
 </html>
