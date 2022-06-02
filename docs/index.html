@@ -13,9 +13,20 @@
 		<script>
 			var canvas = document.getElementById("Canvas");
 			var ctx = canvas.getContext("2d");
+			window.addEventListener("keydown", ChkKey)
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
 			
+			function ChkKey(e) {
+			    var code = e.keyCode;
+			    switch (code) {
+			        case 65: 
+			    }
+			}
+			var OnPress = {};
+			function OnKey(key, func) {
+				KeyFunction[key] = func;
+			}
 			class GameObject {
 				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
 					this.x = coord.x; //todo vector
@@ -31,6 +42,7 @@
 			}
 			function Update() {
 				Render();
+				ControllChar();
 			}
 			function MoveChar() {
 				ctx.beginPath();
@@ -39,6 +51,9 @@
 				ctx.fillStyle = "#0095DD";
 				ctx.fill();
 				ctx.closePath();
+			}
+			function ControllChar() {
+				
 			}
 			function IsCollideWithWall() { //fix
 				if(x + dx > canvas.width-CharRadius || x + dx < CharRadius) {
