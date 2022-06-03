@@ -18,13 +18,14 @@
 			canvas.height = document.body.clientHeight;
 			//system
 			var OnPress = {};
+			var PressedKeys = {};
 			function ChkKey(e) {
 			    var code = e.keyCode;
 			    switch (code) {
-			    	case 87: OnPress.w(); break;
-			        case 65: OnPress.a(); break;
-			        case 83: OnPress.s(); break;
-			        case 68: OnPress.d(); break;
+			    	case 87: PressedKeys.push('w'); break;
+			    	case 65: PressedKeys.push('a') break;
+			    	case 83: PressedKeys.push('s'); break;
+			    	case 68: PressedKeys.push('d'); break;
 			    }
 			}
 			function OnKey(key, func) {
@@ -35,7 +36,13 @@
 			}
 			function Update() {
 				Render();
-				ControllChar();
+				Controll();
+				requestAnimationFrame(Update);
+			}
+			function Controll() {
+				for(let i = 0;i < PressedKeys.length;i++) {
+					PressedKeys[i]();
+				}
 			}
 			class GameObject {
 				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
@@ -65,15 +72,12 @@
 				ctx.fill();
 				ctx.closePath();
 			}
-			function ControllChar() {
-				
-			}
 			OnKey('a', () => {
 				Char.x -= MoveSpeed;
 				console.log(3)
 			})
-			//interval
-			setInterval(Update, 10);
+			//repeat
+			Update();
 		</script>
 	</body>
 </html>
