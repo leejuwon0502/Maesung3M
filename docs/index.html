@@ -20,23 +20,18 @@
 			//system
 			var OnPress = {};
 			var PressedKeys = {};
+			let KEYCODES = {
+				87 : 'w',
+				65 : 'a',
+				83 : 's',
+				68 : 'd'
+			}
 			function KeyDown(e) {
-			    var code = e.keyCode;
-			    switch (code) {
-			    	case 87: PressedKeys['w'] = OnPress.w; break;
-			    	case 65: PressedKeys['a'] = OnPress.a; break;
-			    	case 83: PressedKeys['s'] = OnPress.s; break;
-			    	case 68: PressedKeys['d'] = OnPress.d; break;
-			    }
+				code = KEYCODES[e.keyCode];
+				PressedKeys[code] = OnPress[code];
 			}
 			function KeyUp(e) {
-			    var code = e.keyCode;
-			    switch (code) {
-			    	case 87: delete PressedKeys.w; break;
-			    	case 65: delete PressedKeys.a; break;
-			    	case 83: delete PressedKeys.s; break;
-			    	case 68: delete PressedKeys.d; break;
-			    }
+				delete PressedKeys[KEYCODES[e.keyCode]];
 			}
 			function OnKey(key, func) {
 				OnPress[key] = func;
@@ -72,7 +67,7 @@
 			//variables
 			let Char = new GameObject()
 			Char.Radius = 10;
-			var MoveSpeed = 10;
+			var MoveSpeed = 5;
 			//code
 			function MoveChar() {
 				ctx.beginPath();
