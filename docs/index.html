@@ -13,19 +13,29 @@
 		<script>
 			var canvas = document.getElementById("Canvas");
 			var ctx = canvas.getContext("2d");
-			window.addEventListener("keydown", ChkKey)
+			window.addEventListener("keydown", KeyDown);
+			window.addEventListener("keyup", KeyUp);
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
 			//system
 			var OnPress = {};
 			var PressedKeys = {};
-			function ChkKey(e) {
+			function KeyDown(e) {
 			    var code = e.keyCode;
 			    switch (code) {
-			    	case 87: PressedKeys.push('w'); break;
-			    	case 65: PressedKeys.push('a') break;
-			    	case 83: PressedKeys.push('s'); break;
-			    	case 68: PressedKeys.push('d'); break;
+			    	case 87: PressedKeys['w'] = OnPress.w; break;
+			    	case 65: PressedKeys['a'] = OnPress.a; break;
+			    	case 83: PressedKeys['s'] = OnPress.s; break;
+			    	case 68: PressedKeys['d'] = OnPress.d; break;
+			    }
+			}
+			function KeyUp(e) {
+			    var code = e.keyCode;
+			    switch (code) {
+			    	case 87: delete PressedKeys.w; break;
+			    	case 65: delete PressedKeys.a; break;
+			    	case 83: delete PressedKeys.s; break;
+			    	case 68: delete PressedKeys.d; break;
 			    }
 			}
 			function OnKey(key, func) {
@@ -40,12 +50,12 @@
 				requestAnimationFrame(Update);
 			}
 			function Controll() {
-				for(let i = 0;i < PressedKeys.length;i++) {
-					PressedKeys[i]();
+				for(let key in PressedKeys) {
+					PressedKeys[key]();
 				}
 			}
 			class GameObject {
-				constructor(coord = { x : canvas.width/2, y : canvas.height-30}) {
+				constructor(coord = { x : canvas.width/2, y : canvas.height/2}) {
 					this.x = coord.x;
 					this.y = coord.y;
 				}
@@ -72,9 +82,17 @@
 				ctx.fill();
 				ctx.closePath();
 			}
+			OnKey('w', () => {
+				Char.y -= MoveSpeed;
+			})
 			OnKey('a', () => {
 				Char.x -= MoveSpeed;
-				console.log(3)
+			})
+			OnKey('s', () => {
+				Char.y += MoveSpeed;
+			})
+			OnKey('d', () => {
+				Char.x += MoveSpeed;
 			})
 			//repeat
 			Update();
