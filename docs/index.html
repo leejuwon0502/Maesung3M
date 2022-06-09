@@ -13,11 +13,12 @@
 		<script>
 			var canvas = document.getElementById("Canvas");
 			var ctx = canvas.getContext("2d");
-			window.addEventListener("keydown", KeyDown);
-			window.addEventListener("keyup", KeyUp);
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
 			//system
+			window.addEventListener("keydown", KeyDown);
+			window.addEventListener("keyup", KeyUp);
+			window.addEventListener("mousemove", OnMouseMove);
 			var OnPress = {};
 			var PressedKeys = {};
 			let KEYCODES = {
@@ -28,6 +29,7 @@
 			}
 			function KeyDown(e) {
 				code = KEYCODES[e.keyCode];
+				if (!code) {return}
 				PressedKeys[code] = OnPress[code];
 			}
 			function KeyUp(e) {
@@ -36,8 +38,27 @@
 			function OnKey(key, func) {
 				OnPress[key] = func;
 			}
+			function OnMouseMove(e) {
+				Light.x = e.clientX;
+				Light.y = e.clientY;
+			}
+			OnKey('w', () => {
+				Char.y -= Char.MoveSpeed;
+			})
+			OnKey('a', () => {
+				Char.x -= Char.MoveSpeed;
+			})
+			OnKey('s', () => {
+				Char.y += Char.MoveSpeed;
+			})
+			OnKey('d', () => {
+				Char.x += Char.MoveSpeed;
+			})
 			function Render() {
-				MoveChar();
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				GameObjectArray.forEach((e) => {
+					e.Draw();
+				})
 			}
 			function Update() {
 				Render();
@@ -49,46 +70,50 @@
 					PressedKeys[key]();
 				}
 			}
+			function GetDrawFunction(ObjC, drawInfo) {
+				if (drawInfo.Type = "arc") {
+					return () => {
+						ctx.beginPath();
+						ctx.arc(ObjC.x, ObjC.y, ObjC.DrawInfo.Radius, 0, Math.PI*2);
+						ctx.fillStyle = ObjC.DrawInfo.Color;
+						ctx.fill();
+						ctx.closePath();
+					}
+				}
+			}
 			class GameObject {
-				constructor(coord = { x : canvas.width/2, y : canvas.height/2}) {
+				constructor(
+					coord = { x : canvas.width/2, y : canvas.height/2},
+					drawInfo
+					){
 					this.x = coord.x;
 					this.y = coord.y;
+					this.DrawInfo = [];
+					for(let key in drawInfo) {
+						this.DrawInfo[key] = drawInfo[key];
+					}
+					this.Draw = GetDrawFunction(this, drawInfo);
+
+					GameObjectArray.push(this);
 				}
+				Draw() {}
 			}
-			//api
-			function IsCollideWithWall() { //fix
-				if(x + dx > canvas.width-CharRadius || x + dx < CharRadius) {
-				    dx = -dx;
-				}
-				if(y + dy > canvas.height-CharRadius || y + dy < CharRadius) {
-				    dy = -dy;
-				}
-			}
-			//variables
-			let Char = new GameObject()
+			//init
+			var GameObjectArray = [];
+			var Char = new GameObject(undefined, {
+				Type : "arc",
+				Color : "#0095DD",
+				Radius : 10
+			});
 			Char.Radius = 10;
-			var MoveSpeed = 5;
+			Char.MoveSpeed = 5;
+			var Light = new GameObject(undefined, {
+				Type : "arc",
+				Color : "rgba(0, 0, 0, 0.1)",
+				Radius : 100
+			});
 			//code
-			function MoveChar() {
-				ctx.beginPath();
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				ctx.arc(Char.x, Char.y, Char.Radius, 0, Math.PI*2);
-				ctx.fillStyle = "#0095DD";
-				ctx.fill();
-				ctx.closePath();
-			}
-			OnKey('w', () => {
-				Char.y -= MoveSpeed;
-			})
-			OnKey('a', () => {
-				Char.x -= MoveSpeed;
-			})
-			OnKey('s', () => {
-				Char.y += MoveSpeed;
-			})
-			OnKey('d', () => {
-				Char.x += MoveSpeed;
-			})
+
 			//repeat
 			Update();
 		</script>
