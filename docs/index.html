@@ -15,6 +15,7 @@
 			var ctx = canvas.getContext("2d");
 			canvas.width = document.body.clientWidth;
 			canvas.height = document.body.clientHeight;
+			var Center = { x : canvas.width / 2, y : canvas.height / 2};
 			//system
 			window.addEventListener("keydown", KeyDown);
 			window.addEventListener("keyup", KeyUp);
@@ -54,15 +55,19 @@
 			OnKey('d', () => {
 				Char.x += Char.MoveSpeed;
 			})
+			let ScreenSizeCoef = 50;
+			let ScreenSize = { x : 16 * ScreenSizeCoef, y : 9 * ScreenSizeCoef};
+			var ClearRect = { x : Center.x - ScreenSize.x / 2, y : Center.y - ScreenSize.y / 2};
 			function Render() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.clearRect(ClearRect.x, ClearRect.y, ScreenSize.x, ScreenSize.y);
 				GameObjectArray.forEach((e) => {
 					e.Draw();
 				})
 			}
 			function Update() {
-				Render();
 				Controll();
+				ChkPhysics();
+				Render();
 				requestAnimationFrame(Update);
 			}
 			function Controll() {
@@ -81,24 +86,34 @@
 					}
 				}
 			}
+			function ChkPhysics() {
+				
 			class GameObject {
 				constructor(
-					coord = { x : canvas.width/2, y : canvas.height/2},
+					positionInfo = { x : Center.x, y : Center.y, isDynamic : true },
 					drawInfo
 					){
-					this.x = coord.x;
-					this.y = coord.y;
+					this.Vector = new Vector(positionInfo.x, positionInfo.y)
 					this.DrawInfo = [];
 					for(let key in drawInfo) {
 						this.DrawInfo[key] = drawInfo[key];
 					}
 					this.Draw = GetDrawFunction(this, drawInfo);
-
+					
 					GameObjectArray.push(this);
 				}
 				Draw() {}
 			}
+			class Vector {
+				constructor(x, y) {
+					this.x = x;
+					this.y = y;
+				}
+			}
+			//var
+			
 			//init
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			var GameObjectArray = [];
 			var Char = new GameObject(undefined, {
 				Type : "arc",
@@ -113,7 +128,7 @@
 				Radius : 100
 			});
 			//code
-
+			
 			//repeat
 			Update();
 		</script>
