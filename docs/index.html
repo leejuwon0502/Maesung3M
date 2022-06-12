@@ -77,8 +77,8 @@
 				}
 			}
 
-			function GetMoveMethod(ObjC) {
-				ObjC.
+			function SetMoveMethod(ObjC) {
+				
 			}
 			function ChkPhysics() {
 				
@@ -116,7 +116,7 @@
 					}
 					this.Draw = GetDrawMethod(this, drawInfo);
 					if (positionInfo.isDynamic) {
-						GetMoveMethod(this)
+						SetMoveMethod(this);
 					}
 					
 					GameObjectArray.push(this);
