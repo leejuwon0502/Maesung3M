@@ -39,9 +39,13 @@
 			function OnKey(key, func) {
 				OnPress[key] = func;
 			}
+			MousePos = {
+				x : 0,
+				y : 0
+			}
 			function OnMouseMove(e) {
-				Light.x = e.clientX;
-				Light.y = e.clientY;
+				MousePos.x = e.clientX;
+				MousePos.y = e.clientY;
 			}
 			OnKey('w', () => {
 				Char.y -= Char.MoveSpeed;
@@ -95,7 +99,7 @@
 				if (drawInfo.Type = "arc") {
 					return () => {
 						ctx.beginPath();
-						ctx.arc(ObjC.x, ObjC.y, ObjC.DrawInfo.Radius, 0, Math.PI*2);
+						ctx.arc(ObjC.Position.x, ObjC.Position.y, ObjC.DrawInfo.Radius, 0, Math.PI*2);
 						ctx.fillStyle = ObjC.DrawInfo.Color;
 						ctx.fill();
 						ctx.closePath();
@@ -104,12 +108,21 @@
 			}
 			class GameObject {
 				constructor(
-					positionInfo = { x : Center.x, y : Center.y, isDynamic : true },
-					drawInfo
+					positionInfo = { x : Center.x, y : Center.y },
+					drawInfo,
+					moveSpeed = 0
 					){
 					this.x = positionInfo.x;
 					this.y = positionInfo.y;
 					this.Vector = new Vector();
+					this.Position = {
+						x : positionInfo.x,
+						y : positionInfo.y
+					}
+					this.Vector = {
+						x : 0,
+						y : 0
+					}
 					this.DrawInfo = [];
 					for(let key in drawInfo) {
 						this.DrawInfo[key] = drawInfo[key];
@@ -127,25 +140,41 @@
 				constructor() {
 					this.x = 0;
 					this.y = 0;
+					this.Draw = GetDrawFunction(this, drawInfo);
+					this.MoveSpeed = moveSpeed
+					
+					GameObjectArray.push(this);
 				}
+				Move() {
+					let coef = 1 / (this.Vector.x + this.Vector.y);
+					let DirVec = {
+						x : this.x * coef,
+						y : this.y * coef
+					}
+					this.x += Dirvec.x * this.MoveSpeed;
+					this.y += Dirvec.y * this.MoveSpeed;
+				}
+				Draw() {}
 			}
 			//var
 			
 			//init
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
-			var Char = new GameObject(undefined, {
+			var Char = new GameObject(undefined, 
+			{
 				Type : "arc",
 				Color : "#0095DD",
 				Radius : 10
-			});
+			}, 5
+			);
 			Char.Radius = 10;
-			Char.MoveSpeed = 5;
 			var Light = new GameObject(undefined, {
 				Type : "arc",
 				Color : "rgba(0, 0, 0, 0.1)",
 				Radius : 100
 			});
+			Light.draw //todo this, movement
 			//code
 			
 			//repeat
