@@ -114,7 +114,6 @@
 					){
 					this.x = positionInfo.x;
 					this.y = positionInfo.y;
-					this.Vector = new Vector();
 					this.Position = {
 						x : positionInfo.x,
 						y : positionInfo.y
@@ -131,31 +130,23 @@
 					if (positionInfo.isDynamic) {
 						SetMoveMethod(this);
 					}
-					
-					GameObjectArray.push(this);
-				}
-				Draw() {}
-			}
-			class Vector {
-				constructor() {
-					this.x = 0;
-					this.y = 0;
-					this.Draw = GetDrawFunction(this, drawInfo);
-					this.MoveSpeed = moveSpeed
-					
+					this.MoveSpeed = moveSpeed;
+
 					GameObjectArray.push(this);
 				}
 				Move() {
 					let coef = 1 / (this.Vector.x + this.Vector.y);
-					let DirVec = {
-						x : this.x * coef,
-						y : this.y * coef
+					coef = coef == Infinity ? 0 : coef;
+					console.log(coef)
+					this.DirVec = {
+						x : this.Vector.x * coef,
+						y : this.Vector.y * coef
 					}
-					this.x += Dirvec.x * this.MoveSpeed;
-					this.y += Dirvec.y * this.MoveSpeed;
+					this.Position.x += this.DirVec.x * this.MoveSpeed;
+					this.Position.y += this.DirVec.y * this.MoveSpeed;
 				}
 				Draw() {}
-			}
+				}
 			//var
 			
 			//init
