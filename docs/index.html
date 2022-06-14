@@ -88,7 +88,7 @@
 					if (!e.isDynamic) {
 						return;
 					}
-					
+					let Stride = Char.MoveSpeed > Char.Vector.x;
 				})
 			}
 			function GetDrawMethod(ObjC, drawInfo) {
@@ -109,7 +109,7 @@
 					){
 					this.x = positionInfo.x;
 					this.y = positionInfo.y;
-					this.Velocity = new Velocity();
+					this.Vector = new Vector();
 					this.DrawInfo = [];
 					for(let key in drawInfo) {
 						this.DrawInfo[key] = drawInfo[key];
@@ -123,7 +123,7 @@
 				}
 				Draw() {}
 			}
-			class Velocity {
+			class Vector {
 				constructor() {
 					this.x = 0;
 					this.y = 0;
