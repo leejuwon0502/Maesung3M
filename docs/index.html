@@ -21,11 +21,11 @@
 			window.addEventListener("keyup", KeyUp);
 			window.addEventListener("mousemove", OnMouseMove);
 			var OnPress = {};
-			var PressedKeys = {};
+			var PressedKeys = [];
 			let KEYCODES = {
 				87 : 'w',
 				65 : 'a',
-				83 : 's',
+				//83 : 's',
 				68 : 'd'
 			}
 			function KeyDown(e) {
@@ -48,16 +48,16 @@
 				MousePos.y = e.clientY;
 			}
 			OnKey('w', () => {
-				Char.y -= Char.MoveSpeed;
+				Char.Move(0, -Char.MoveSpeed);
 			})
 			OnKey('a', () => {
-				Char.x -= Char.MoveSpeed;
-			})
-			OnKey('s', () => {
-				Char.y += Char.MoveSpeed;
+				Char.Move(-Char.MoveSpeed, 0);
 			})
 			OnKey('d', () => {
-				Char.x += Char.MoveSpeed;
+				Char.Move(Char.MoveSpeed, 0);
+			})
+			OnKey('w', () => {
+				Jump();
 			})
 			let ScreenSizeCoef = 50;
 			let ScreenSize = { x : 16 * ScreenSizeCoef, y : 9 * ScreenSizeCoef};
@@ -77,6 +77,7 @@
 			}
 			function Controll() {
 				for(let key in PressedKeys) {
+					console.log(key)
 					PressedKeys[key]();
 				}
 			}
@@ -92,7 +93,7 @@
 					if (!e.isDynamic) {
 						return;
 					}
-					let Stride = Char.MoveSpeed > Char.Vector.x;
+					e.Move(e.Velocity.x, e.Velocity.y);
 				})
 			}
 			function GetDrawMethod(ObjC, drawInfo) {
@@ -118,7 +119,7 @@
 						x : positionInfo.x,
 						y : positionInfo.y
 					}
-					this.Vector = {
+					this.Velocity = {
 						x : 0,
 						y : 0
 					}
@@ -134,21 +135,19 @@
 
 					GameObjectArray.push(this);
 				}
-				Move() {
-					let coef = 1 / (this.Vector.x + this.Vector.y);
-					coef = coef == Infinity ? 0 : coef;
-					console.log(coef)
-					this.DirVec = {
-						x : this.Vector.x * coef,
-						y : this.Vector.y * coef
-					}
-					this.Position.x += this.DirVec.x * this.MoveSpeed;
-					this.Position.y += this.DirVec.y * this.MoveSpeed;
+				Move(x = 0, y = 0) {
+					this.Position.x += x;
+					this.Position.y += y;
 				}
 				Draw() {}
 				}
-			//var
-			
+			//var, func
+			var JumpHeight = 50;
+			Jump() {
+				if (true) {
+					Char.Velocity.y += JumpHeight;
+				}
+			}
 			//init
 			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
