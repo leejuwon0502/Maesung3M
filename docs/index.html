@@ -69,24 +69,41 @@
 				})
 			}
 			function Update() {
+				Debug();
 				Controll();
-				ChkPhysics();
 				ApplyPhysics();
 				Render();
 				requestAnimationFrame(Update);
 			}
 			function Controll() {
 				for(let key in PressedKeys) {
-					console.log(key)
 					PressedKeys[key]();
 				}
 			}
-
-			function SetMoveMethod(ObjC) {
-				
-			}
-			function ChkPhysics() {
-				
+			function GetCollidedArray(Obj) {
+				let Arr = [];
+				let x, y;
+				if (Obj.__proto__.constructor == GameObject) {
+					x = Obj.Position.x;
+					y = Obj.Position.y;
+				}
+				else {
+					x = Obj[0];
+					y = Obj[1];
+				}
+				GameObjectArray.forEach((e) => {
+					// let x = e.DrawInfo.Radius || e.DrawInfo.Width;
+					// let y = e.DrawInfo.Radius || e.DrawInfo.Height;
+					//x > e.x  
+					let ePx = e.Position.x;
+					let ePy = e.Position.y;
+					let eWidth = e.DrawInfo.Radius || e.DrawInfo.Width;
+					let eHeight = e.DrawInfo.Radius || e.DrawInfo.Height;
+					if (x > ePx && x < ePx + eWidth && y > ePy && y < ePy + eHeight) {
+						Arr.push(e);
+					}
+				})
+				return Arr;
 			}
 			function ApplyPhysics() {
 				GameObjectArray.forEach((e) => {
@@ -94,10 +111,11 @@
 						return;
 					}
 					e.Move(e.Velocity.x, e.Velocity.y);
+					e.Velocity.y += Gravity;
 				})
 			}
 			function GetDrawMethod(ObjC, drawInfo) {
-				if (drawInfo.Type = "arc") {
+				if (drawInfo.Type == "arc") {
 					return () => {
 						ctx.beginPath();
 						ctx.arc(ObjC.Position.x, ObjC.Position.y, ObjC.DrawInfo.Radius, 0, Math.PI*2);
@@ -106,18 +124,41 @@
 						ctx.closePath();
 					}
 				}
+				else if (drawInfo.Type == "rect") {
+					return () => {
+						ctx.beginPath();
+						ctx.rect(ObjC.Position.x, ObjC.Position.y, ObjC.DrawInfo.Width, ObjC.DrawInfo.Height);
+						ctx.fillStyle = ObjC.DrawInfo.Color;
+						ctx.fill();
+						ctx.closePath();
+					}
+				}
 			}
 			class GameObject {
 				constructor(
-					positionInfo = { x : Center.x, y : Center.y },
+					positionInfo = [0, 0, "rel"],
 					drawInfo,
 					moveSpeed = 0
 					){
-					this.x = positionInfo.x;
-					this.y = positionInfo.y;
-					this.Position = {
-						x : positionInfo.x,
-						y : positionInfo.y
+					if (positionInfo[2] == "rel") {
+						if (drawInfo.Type == "arc") {
+							this.Position = {
+								x : Center.x + positionInfo[0],
+								y : Center.y - positionInfo[1]
+							}
+						}
+						else {
+							this.Position = {
+								x : Center.x + positionInfo[0] - drawInfo.Width / 2,
+								y : Center.y - positionInfo[1] - drawInfo.Height / 2
+							}
+						}
+					}
+					else {
+						this.Position = {
+							x : positionInfo[0],
+							y : positionInfo[1]
+						}
 					}
 					this.Velocity = {
 						x : 0,
@@ -128,31 +169,33 @@
 						this.DrawInfo[key] = drawInfo[key];
 					}
 					this.Draw = GetDrawMethod(this, drawInfo);
-					if (positionInfo.isDynamic) {
-						SetMoveMethod(this);
-					}
 					this.MoveSpeed = moveSpeed;
+					this.isDynamic = moveSpeed != 0;
 
 					GameObjectArray.push(this);
 				}
 				Move(x = 0, y = 0) {
+				 //todo 바닥판정, 물리, 상대적 크기/포지션
 					this.Position.x += x;
 					this.Position.y += y;
 				}
 				Draw() {}
-				}
+			}
 			//var, func
-			var JumpHeight = 50;
-			Jump() {
-				if (true) {
-					Char.Velocity.y += JumpHeight;
+			function Debug() {
+				
+			}
+			var JumpHeight = 10;
+			var Gravity = 3;
+			function Jump() {
+				if (Char.Velocity.y == 0) {
+					Char.Velocity.y += -JumpHeight;
 				}
 			}
 			//init
 			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
-			var Char = new GameObject(undefined, 
-			{
+			var Char = new GameObject(undefined, {
 				Type : "arc",
 				Color : "#0095DD",
 				Radius : 10
@@ -164,7 +207,13 @@
 				Color : "rgba(0, 0, 0, 0.1)",
 				Radius : 100
 			});
-			Light.draw //todo this, movement
+			a = new GameObject([0, -ScreenSize.y / 2, "abs"], {
+				Type : "rect",
+				Color : "#000FFF",
+				Width : 500,
+				Height : 10
+			})
+			//Light.draw //todo 빛
 			//code
 			
 			//repeat
