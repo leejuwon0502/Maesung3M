@@ -47,9 +47,6 @@
 				MousePos.x = e.clientX;
 				MousePos.y = e.clientY;
 			}
-			OnKey('w', () => {
-				Char.Move(0, -Char.MoveSpeed);
-			})
 			OnKey('a', () => {
 				Char.Move(-Char.MoveSpeed, 0);
 			})
@@ -102,6 +99,7 @@
 					if (x > ePx && x < ePx + eWidth && y > ePy && y < ePy + eHeight) {
 						Arr.push(e);
 					}
+				
 				})
 				return Arr;
 			}
@@ -111,7 +109,7 @@
 						return;
 					}
 					e.Move(e.Velocity.x, e.Velocity.y);
-					e.Velocity.y += Gravity;
+					//e.Velocity.y += Gravity;
 				})
 			}
 			function GetDrawMethod(ObjC, drawInfo) {
@@ -140,6 +138,7 @@
 					drawInfo,
 					moveSpeed = 0
 					){
+					console.log(positionInfo[2])
 					if (positionInfo[2] == "rel") {
 						if (drawInfo.Type == "arc") {
 							this.Position = {
@@ -150,7 +149,7 @@
 						else {
 							this.Position = {
 								x : Center.x + positionInfo[0] - drawInfo.Width / 2,
-								y : Center.y - positionInfo[1] - drawInfo.Height / 2
+								y : Center.y - positionInfo[1]
 							}
 						}
 					}
@@ -192,10 +191,18 @@
 					Char.Velocity.y += -JumpHeight;
 				}
 			}
+			function NewBlock(pos, width, height) {
+				return new GameObject(pos, {
+					Type : "rect",
+					Color : "#000000",
+					Width : width,
+					Height : height
+				})
+			}
 			//init
 			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
-			var Char = new GameObject(undefined, {
+			var Char = new GameObject([0, -ClearRectPosition.y], {
 				Type : "arc",
 				Color : "#0095DD",
 				Radius : 10
@@ -207,12 +214,7 @@
 				Color : "rgba(0, 0, 0, 0.1)",
 				Radius : 100
 			});
-			a = new GameObject([0, -ScreenSize.y / 2, "abs"], {
-				Type : "rect",
-				Color : "#000FFF",
-				Width : 500,
-				Height : 10
-			})
+			a = NewBlock([0, (-ScreenSize.y / 2), "rel"]);
 			//Light.draw //todo 빛
 			//code
 			
