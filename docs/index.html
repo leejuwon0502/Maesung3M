@@ -25,7 +25,7 @@
 			let KEYCODES = {
 				87 : 'w',
 				65 : 'a',
-				//83 : 's',
+				83 : 's',
 				68 : 'd'
 			}
 			function KeyDown(e) {
@@ -46,6 +46,8 @@
 			function OnMouseMove(e) {
 				MousePos.x = e.clientX;
 				MousePos.y = e.clientY;
+				Light.Position.x = MousePos.x;
+				Light.Position.y = MousePos.y;
 			}
 			OnKey('a', () => {
 				Char.Move(-Char.MoveSpeed, 0);
@@ -55,6 +57,9 @@
 			})
 			OnKey('w', () => {
 				Jump();
+			})
+			OnKey('s', () => {
+				console.log(MousePos)
 			})
 			let ScreenSizeCoef = 50;
 			let ScreenSize = { x : 16 * ScreenSizeCoef, y : 9 * ScreenSizeCoef};
@@ -138,18 +143,23 @@
 					drawInfo,
 					moveSpeed = 0
 					){
-					console.log(positionInfo[2])
 					if (positionInfo[2] == "rel") {
 						if (drawInfo.Type == "arc") {
 							this.Position = {
 								x : Center.x + positionInfo[0],
-								y : Center.y - positionInfo[1]
+								y : Center.y + positionInfo[1]
 							}
 						}
 						else {
+							let coef = [
+								positionInfo[0] / Math.abs(positionInfo[0]),
+								positionInfo[1] / Math.abs(positionInfo[1])
+							]
+							coef[0] |= 1;
+							coef[1] |= 1;
 							this.Position = {
 								x : Center.x + positionInfo[0] - drawInfo.Width / 2,
-								y : Center.y - positionInfo[1]
+								y : Center.y + (positionInfo[1] + drawInfo.Height / 2 * coef[1]) - drawInfo.Height / 2
 							}
 						}
 					}
@@ -191,18 +201,18 @@
 					Char.Velocity.y += -JumpHeight;
 				}
 			}
-			function NewBlock(pos, width, height) {
+			function NewBlock(pos, size) {
 				return new GameObject(pos, {
 					Type : "rect",
-					Color : "#000000",
-					Width : width,
-					Height : height
+					Color : "#FF0000",
+					Width : size[0],
+					Height : size[1]
 				})
 			}
 			//init
 			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
-			var Char = new GameObject([0, -ClearRectPosition.y], {
+			var Char = new GameObject([0, 0, "rel"], {
 				Type : "arc",
 				Color : "#0095DD",
 				Radius : 10
@@ -214,7 +224,12 @@
 				Color : "rgba(0, 0, 0, 0.1)",
 				Radius : 100
 			});
-			a = NewBlock([0, (-ScreenSize.y / 2), "rel"]);
+			Walls = [
+			NewBlock([0, ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
+			NewBlock([0, -ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
+			NewBlock([-ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y]),
+			NewBlock([ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y])
+			]
 			//Light.draw //todo 빛
 			//code
 			
