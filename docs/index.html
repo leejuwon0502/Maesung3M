@@ -82,39 +82,70 @@
 					PressedKeys[key]();
 				}
 			}
-			function GetCollidedArray(Obj) {
+			function GetCollidedArray(Obj, Size, Num = Obj.Num) { //obj or coord
 				let Arr = [];
-				let x, y;
+				let x, y, Width, Height;
 				if (Obj.__proto__.constructor == GameObject) {
 					x = Obj.Position.x;
 					y = Obj.Position.y;
+					Width = Obj.DrawInfo.Radius || Obj.DrawInfo.Width;
+					Height = Obj.DrawInfo.Radius || Obj.DrawInfo.Height;
 				}
 				else {
 					x = Obj[0];
 					y = Obj[1];
+					Width = Size[0];
+					Height = Size[1] || Size[0];
 				}
 				GameObjectArray.forEach((e) => {
-					// let x = e.DrawInfo.Radius || e.DrawInfo.Width;
-					// let y = e.DrawInfo.Radius || e.DrawInfo.Height;
-					//x > e.x  
+					if (!e.DoCollider || e.Num == Num) {
+						return;
+					}
 					let ePx = e.Position.x;
 					let ePy = e.Position.y;
 					let eWidth = e.DrawInfo.Radius || e.DrawInfo.Width;
 					let eHeight = e.DrawInfo.Radius || e.DrawInfo.Height;
-					if (x > ePx && x < ePx + eWidth && y > ePy && y < ePy + eHeight) {
+					if (x + Width >= ePx && x - Width <= ePx + eWidth && y + Height >= ePy && y + Height <= ePy + eHeight) {
 						Arr.push(e);
 					}
-				
 				})
 				return Arr;
+			}
+			function GetSoulutionFromColArr(ColArr, Chk, Obj, value) {
+				let Sol = Infinity;
+				let Chking = Chk;
+				for (var i = 0;i < ColArr.length; i++) {
+					let gap = 0;
+					let CP = ColArr[i].Position[Chking];
+					let OP = Obj.Position[Chking];
+					let ObjSize = Obj.DrawInfo.Radius || (Chking == 'x' ? Obj.DrawInfo.Width : Obj.DrawInfo.Height);
+					gap = CP - OP;
+					gap = CP < OP ? gap + ObjSize : gap - ObjSize;
+					if (Math.abs(Sol) > Math.abs(gap)) {
+						Sol = gap;
+					}
+				}
+				if (Sol == Infinity) {
+					Sol = 0;
+				}
+				value |= 1;
+				return Sol * (value / Math.abs(value));
+			}
+			function GetSimulatedObjInfo(Obj, Sim) {
+				return [[Obj.Position.x + Sim[0], Obj.Position.y + Sim[1]], Obj.DrawInfo.Type == "arc" ? [Obj.DrawInfo.Radius] : [Obj.DrawInfo.Width, Obj.DrawInfo.Height]];
+			}
+			function CalcPhysics(e) {
+				e.Velocity.y += Gravity * e.IsFalling;
 			}
 			function ApplyPhysics() {
 				GameObjectArray.forEach((e) => {
 					if (!e.isDynamic) {
 						return;
 					}
-					e.Move(e.Velocity.x, e.Velocity.y);
-					//e.Velocity.y += Gravity;
+					CalcPhysics(e)
+					if (!(e.Velocity.x == 0 && e.Velocity.y == 0)) {
+						e.Move(e.Velocity.x, e.Velocity.y);
+					}
 				})
 			}
 			function GetDrawMethod(ObjC, drawInfo) {
@@ -141,7 +172,7 @@
 				constructor(
 					positionInfo = [0, 0, "rel"],
 					drawInfo,
-					moveSpeed = 0
+					MoveInfo = [0, true] //movespeed, docollider
 					){
 					if (positionInfo[2] == "rel") {
 						if (drawInfo.Type == "arc") {
@@ -155,10 +186,10 @@
 								positionInfo[0] / Math.abs(positionInfo[0]),
 								positionInfo[1] / Math.abs(positionInfo[1])
 							]
-							coef[0] |= 1;
-							coef[1] |= 1;
+							coef[0] |= 0;
+							coef[1] |= 0;
 							this.Position = {
-								x : Center.x + positionInfo[0] - drawInfo.Width / 2,
+								x : Center.x + (positionInfo[0] + drawInfo.Width / 2 * coef[0]) - drawInfo.Width / 2,
 								y : Center.y + (positionInfo[1] + drawInfo.Height / 2 * coef[1]) - drawInfo.Height / 2
 							}
 						}
@@ -178,13 +209,31 @@
 						this.DrawInfo[key] = drawInfo[key];
 					}
 					this.Draw = GetDrawMethod(this, drawInfo);
-					this.MoveSpeed = moveSpeed;
-					this.isDynamic = moveSpeed != 0;
+					this.MoveSpeed = MoveInfo[0];
+					this.isDynamic = this.MoveSpeed != 0;
+					this.DoCollider = MoveInfo[1];
+					this.IsFalling = true;
 
+					this.Num = GameObjectArray.length;
 					GameObjectArray.push(this);
 				}
 				Move(x = 0, y = 0) {
-				 //todo 바닥판정, 물리, 상대적 크기/포지션
+					//todo 상대적 크기/포지션
+					let SimObjInfo_Y = GetSimulatedObjInfo(this, [0, y]);
+					let CollidedArray_Y = GetCollidedArray(SimObjInfo_Y[0], SimObjInfo_Y[1], this.Num);
+					if (CollidedArray_Y.length > 0) {
+						if (y > 0) {
+							this.IsFalling = false;
+						}
+						this.Velocity.y = 0;
+						y = GetSoulutionFromColArr(CollidedArray_Y, 'y', this, y);
+					}
+					let SimObjInfo_X = GetSimulatedObjInfo(this, [x, 0]);
+					let CollidedArray_X = GetCollidedArray(SimObjInfo_X[0], SimObjInfo_X[1], this.Num);
+					if (CollidedArray_X.length > 0) {
+						this.Velocity.x = 0;
+						x = GetSoulutionFromColArr(CollidedArray_X, 'x', this, x);
+					}
 					this.Position.x += x;
 					this.Position.y += y;
 				}
@@ -192,14 +241,16 @@
 			}
 			//var, func
 			function Debug() {
-				
+
 			}
-			var JumpHeight = 10;
-			var Gravity = 3;
+			var JumpHeight = 30;
+			var Gravity = 0.5;
 			function Jump() {
-				if (Char.Velocity.y == 0) {
-					Char.Velocity.y += -JumpHeight;
+				if (Char.IsFalling) {
+					return;
 				}
+				Char.IsFalling = true;
+				Char.Velocity.y -= JumpHeight;
 			}
 			function NewBlock(pos, size) {
 				return new GameObject(pos, {
@@ -209,6 +260,7 @@
 					Height : size[1]
 				})
 			}
+
 			//init
 			ctx.fillRect(0, 0, canvas.width, canvas.height); //화면을 검게 한다
 			var GameObjectArray = [];
@@ -216,14 +268,14 @@
 				Type : "arc",
 				Color : "#0095DD",
 				Radius : 10
-			}, 5
+			}, [5, true]
 			);
 			Char.Radius = 10;
 			var Light = new GameObject(undefined, {
 				Type : "arc",
 				Color : "rgba(0, 0, 0, 0.1)",
 				Radius : 100
-			});
+			}, [0, false]);
 			Walls = [
 			NewBlock([0, ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
 			NewBlock([0, -ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
@@ -232,10 +284,9 @@
 			]
 			//Light.draw //todo 빛
 			//code
-			
+			var a;
 			//repeat
 			Update();
 		</script>
 	</body>
 </html>
-
