@@ -114,22 +114,36 @@
 			function GetSoulutionFromColArr(ColArr, Chk, Obj, value) {
 				let Sol = Infinity;
 				let Chking = Chk;
+				let CP, OP;
 				for (var i = 0;i < ColArr.length; i++) {
 					let gap = 0;
-					let CP = ColArr[i].Position[Chking];
-					let OP = Obj.Position[Chking];
+					CP = ColArr[i].Position[Chking];
+					OP = Obj.Position[Chking];
 					let ObjSize = Obj.DrawInfo.Radius || (Chking == 'x' ? Obj.DrawInfo.Width : Obj.DrawInfo.Height);
 					gap = CP - OP;
-					gap = CP < OP ? gap + ObjSize : gap - ObjSize;
+					if(CP < OP) {
+						if (Chk == 'x') {
+							gap = gap + ColArr[i].DrawInfo.Width + ObjSize + 1;
+						}else{
+							gap = gap + ColArr[i].DrawInfo.Height;
+						}
+					}else{
+						gap -= ObjSize;
+					}
 					if (Math.abs(Sol) > Math.abs(gap)) {
 						Sol = gap;
 					}
 				}
 				if (Sol == Infinity) {
-					Sol = 0;
+					Sol = value;
 				}
 				value |= 1;
-				return Sol * (value / Math.abs(value));
+				if (Chk == 'x' && CP < OP) {
+					return Sol;
+				}else{
+					return Sol * (value / Math.abs(value)) - value / value; 
+				}
+				
 			}
 			function GetSimulatedObjInfo(Obj, Sim) {
 				return [[Obj.Position.x + Sim[0], Obj.Position.y + Sim[1]], Obj.DrawInfo.Type == "arc" ? [Obj.DrawInfo.Radius] : [Obj.DrawInfo.Width, Obj.DrawInfo.Height]];
