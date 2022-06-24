@@ -113,37 +113,21 @@
 			}
 			function GetSoulutionFromColArr(ColArr, Chk, Obj, value) {
 				let Sol = Infinity;
-				let Chking = Chk;
-				let CP, OP;
+				value = value >= 0 ? 1 : -1;
 				for (var i = 0;i < ColArr.length; i++) {
-					let gap = 0;
-					CP = ColArr[i].Position[Chking];
-					OP = Obj.Position[Chking];
-					let ObjSize = Obj.DrawInfo.Radius || (Chking == 'x' ? Obj.DrawInfo.Width : Obj.DrawInfo.Height);
-					gap = CP - OP;
-					if(CP < OP) {
-						if (Chk == 'x') {
-							gap = gap + ColArr[i].DrawInfo.Width + ObjSize + 1;
-						}else{
-							gap = gap + ColArr[i].DrawInfo.Height;
-						}
-					}else{
-						gap -= ObjSize;
+					let Gap = 0;
+					let OP = 
+					if (Chk == 'x') {
+						
 					}
+					else {
+						
+					]
 					if (Math.abs(Sol) > Math.abs(gap)) {
-						Sol = gap;
+						Sol = Gap;
 					}
 				}
-				if (Sol == Infinity) {
-					Sol = value;
-				}
-				value |= 1;
-				if (Chk == 'x' && CP < OP) {
-					return Sol;
-				}else{
-					return Sol * (value / Math.abs(value)) - value / value; 
-				}
-				
+				return Sol;
 			}
 			function GetSimulatedObjInfo(Obj, Sim) {
 				return [[Obj.Position.x + Sim[0], Obj.Position.y + Sim[1]], Obj.DrawInfo.Type == "arc" ? [Obj.DrawInfo.Radius] : [Obj.DrawInfo.Width, Obj.DrawInfo.Height]];
@@ -242,12 +226,16 @@
 						this.Velocity.y = 0;
 						y = GetSoulutionFromColArr(CollidedArray_Y, 'y', this, y);
 					}
+					else {
+						this.IsFalling = true;
+					}
 					let SimObjInfo_X = GetSimulatedObjInfo(this, [x, 0]);
 					let CollidedArray_X = GetCollidedArray(SimObjInfo_X[0], SimObjInfo_X[1], this.Num);
 					if (CollidedArray_X.length > 0) {
 						this.Velocity.x = 0;
 						x = GetSoulutionFromColArr(CollidedArray_X, 'x', this, x);
 					}
+					console.log(CollidedArray_X, CollidedArray_Y);
 					this.Position.x += x;
 					this.Position.y += y;
 				}
@@ -269,7 +257,7 @@
 			function NewBlock(pos, size) {
 				return new GameObject(pos, {
 					Type : "rect",
-					Color : "#FF0000",
+					Color : "#000000",
 					Width : size[0],
 					Height : size[1]
 				})
@@ -291,11 +279,12 @@
 				Radius : 100
 			}, [0, false]);
 			Walls = [
-			NewBlock([0, ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
-			NewBlock([0, -ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
-			NewBlock([-ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y]),
-			NewBlock([ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y])
+				NewBlock([0, ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
+				NewBlock([0, -ScreenSize.y / 2, "rel"], [ScreenSize.x, 100]),
+				NewBlock([-ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y]),
+				NewBlock([ScreenSize.x / 2, 0, "rel"], [100, ScreenSize.y])
 			]
+			NewBlock([0, 0, "rel"], [100, 100]);
 			//Light.draw //todo 빛
 			//code
 			var a;
