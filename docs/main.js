@@ -249,7 +249,7 @@ function init() {
     
   }
   var JumpHeight = 20;
-  var Gravity = 0.5;
+  var Gravity = 1;
   function Jump() {
     if (Char.IsFalling) {
       return;
